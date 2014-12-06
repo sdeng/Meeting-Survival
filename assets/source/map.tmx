@@ -13,7 +13,7 @@
  </layer>
  <layer name="Foreground" width="30" height="20">
   <data encoding="base64" compression="zlib">
-   eJxzZ2Bg8ABidzrT/kAcMAD0KBgFo2AUjIJRMBhAIONAu2AU0BIAADCZEgU=
+   eJxzZ2Bg8ABidzrT/kAcMAD0KBgFo2AU0BMEMg60C0bBKBgFAwEA3ZESBQ==
   </data>
  </layer>
  <layer name="Whiteboard" width="30" height="20">

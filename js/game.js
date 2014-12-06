@@ -103,19 +103,21 @@ function create() {
     foreground_layer.resizeWorld();
     whiteboard_layer.resizeWorld();
 
-    coffee_steam = game.add.emitter(11, 529, 1000);
+    coffee_steam = game.add.emitter(491, 367, 1000);
     coffee_steam.makeParticles('coffee-steam');
-    coffee_steam.setXSpeed(0, 1);
+    coffee_steam.setXSpeed(0, 0.1);
     coffee_steam.setYSpeed(0, 0);
     coffee_steam.setRotation(0, 10);
     coffee_steam.setAlpha(1, 0, 10000, Phaser.Easing.Quintic.Out);
     coffee_steam.setScale(0.1, 1, 0.1, 0.2, 0);
-    coffee_steam.gravity = -10;
+    coffee_steam.gravity = -5;
     coffee_steam.start(false, 4000, 5);
 
     var name_tag_style = {
         font: 'sans serif',
-        fill: '#fff'
+        fill: '#fff',
+        stroke: '#000',
+        strokeThickness: 5
     };
 
     for (var i=1; i<npc_data.length; i++) {
