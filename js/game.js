@@ -46,6 +46,7 @@ var map,
     background_layer,
     foreground_layer,
     whiteboard_layer,
+    coffee_steam,
     player;
 
 function generate_sentence() {
@@ -68,7 +69,7 @@ function start_npc_dialog() {
     setInterval(function() {
         var sentence = generate_sentence();
         if (!!dialog) {game.world.remove(dialog);}
-        dialog = game.add.text(400, 45, sentence, dialog_style);
+        dialog = game.add.text(400, 40, sentence, dialog_style);
     }, 5000);
 }
 
@@ -76,6 +77,7 @@ function preload() {
     game.load.tilemap('map', 'assets/map.json', null, Phaser.Tilemap.TILED_JSON);
     game.load.image('office-tiles', 'assets/office-tiles.png', 32, 32);
     game.load.image('coffee-tiles', 'assets/coffee.png', 32, 32);
+    game.load.image('coffee-steam', 'assets/coffee-steam.png');
 
     for (var i=0; i<npc_data.length; i++) {
         var name = npc_data[i].name;
@@ -100,6 +102,16 @@ function create() {
     background_layer.resizeWorld();
     foreground_layer.resizeWorld();
     whiteboard_layer.resizeWorld();
+
+    coffee_steam = game.add.emitter(11, 529, 1000);
+    coffee_steam.makeParticles('coffee-steam');
+    coffee_steam.setXSpeed(0, 1);
+    coffee_steam.setYSpeed(0, 0);
+    coffee_steam.setRotation(0, 10);
+    coffee_steam.setAlpha(1, 0, 10000, Phaser.Easing.Quintic.Out);
+    coffee_steam.setScale(0.1, 1, 0.1, 0.2, 0);
+    coffee_steam.gravity = -10;
+    coffee_steam.start(false, 4000, 5);
 
     var name_tag_style = {
         font: 'sans serif',
