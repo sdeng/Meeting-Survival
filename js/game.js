@@ -64,18 +64,26 @@ function create() {
     background_layer = map.createLayer('Background');
     background_layer.resizeWorld();
 
-    for (var i=0; i<npc_data.length; i++) {
+    var name_tag_style = {
+        font: 'sans serif',
+        fill: '#fff'
+    };
+
+    for (var i=1; i<npc_data.length; i++) {
         var name = npc_data[i].name;
         var x = npc_data[i].position[0];
         var y = npc_data[i].position[1];
         var npc = game.add.sprite(x, y, name);
+        game.add.text(x, y+30, name, name_tag_style);
         game.physics.arcade.enable(npc);
         npc.body.collideWorldBounds = true;
         npcs.push(npc);
     }
 
-    player = npcs[0];
+    player = game.add.sprite(npc_data[0].position[0], npc_data[0].position[1], npc_data[0].name);
     player.anchor.set(0.5);
+    game.physics.arcade.enable(player);
+    player.body.collideWorldBounds = true;
 }
 
 function update() {
