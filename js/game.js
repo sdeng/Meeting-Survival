@@ -42,59 +42,26 @@ var sentence_fragments = {
     objects: ['customer segments', 'business units', 'key performance metrics', 'stakeholders', 'return on investment', 'common painpoints', 'value-add', 'the long pole in the tent'],
     endings: ['.', '!', ', as it were.', ', if you will.', ' with all hands on deck.', ' solutions.', ', but let\'s take this offline.', ', but table that for now.', '. Is that on your radar?', ' in the weeds']
 }
+var dialog_style = {
+    font: 'bold 10pt arial',
+    fill: '#000',
+    wordWrap: true,
+    wordWrapWidth: '400'
+};
 var map,
     background_layer,
     foreground_layer,
     whiteboard_layer,
+    dialog,
+    coffee,
     coffee_steam,
+    attention_span,
+    attention_bar,
     player;
 
-function generate_sentence() {
-    var subject = sentence_fragments.subjects[Math.round(Math.random() * (sentence_fragments.subjects.length - 1))];
-    var verb = sentence_fragments.verbs[Math.round(Math.random() * (sentence_fragments.verbs.length - 1))];
-    var object = sentence_fragments.objects[Math.round(Math.random() * (sentence_fragments.objects.length - 1))];
-    var ending = sentence_fragments.endings[Math.round(Math.random() * (sentence_fragments.endings.length - 1))];
-    return subject+' '+verb+' '+object+ending;
-}
-
-function start_npc_dialog() {
-    var dialog_style = {
-        font: 'bold 10pt arial',
-        fill: '#000',
-        wordWrap: true,
-        wordWrapWidth: '400'
-    };
-    var dialog = null;
-
-    setInterval(function() {
-        var sentence = generate_sentence();
-        if (!!dialog) {game.world.remove(dialog);}
-        dialog = game.add.text(400, 40, sentence, dialog_style);
-    }, 5000);
-}
-
-function preload() {
-    game.load.tilemap('map', 'assets/map.json', null, Phaser.Tilemap.TILED_JSON);
-    game.load.image('office-tiles', 'assets/office-tiles.png', 32, 32);
-    game.load.image('coffee-tiles', 'assets/coffee.png', 32, 32);
-    game.load.image('coffee-steam', 'assets/coffee-steam.png');
-
-    for (var i=0; i<npc_data.length; i++) {
-        var name = npc_data[i].name;
-        game.load.image(name, 'assets/'+name+'.png', 32, 32);
-    }
-}
-
-function create() {
-    game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-    game.scale.pageAlignHorizontally = true;
-    game.scale.pageAlignvertically = true;
-    game.physics.startSystem(Phaser.Physics.ARCADE);
-    game.physics.arcade.skipQuadTree = false;
-
+function render_map() {
     map = game.add.tilemap('map');
     map.addTilesetImage('office-tiles', 'office-tiles', 960, 640);
-    map.addTilesetImage('coffee', 'coffee-tiles', 960, 640);
 
     background_layer = map.createLayer('Background');
     foreground_layer = map.createLayer('Foreground');
@@ -102,17 +69,9 @@ function create() {
     background_layer.resizeWorld();
     foreground_layer.resizeWorld();
     whiteboard_layer.resizeWorld();
+}
 
-    coffee_steam = game.add.emitter(491, 367, 1000);
-    coffee_steam.makeParticles('coffee-steam');
-    coffee_steam.setXSpeed(0, 0.1);
-    coffee_steam.setYSpeed(0, 0);
-    coffee_steam.setRotation(0, 10);
-    coffee_steam.setAlpha(1, 0, 10000, Phaser.Easing.Quintic.Out);
-    coffee_steam.setScale(0.1, 1, 0.1, 0.2, 0);
-    coffee_steam.gravity = -5;
-    coffee_steam.start(false, 4000, 5);
-
+function render_npcs() {
     var name_tag_style = {
         font: 'sans serif',
         fill: '#fff',
@@ -130,16 +89,99 @@ function create() {
         npc.body.collideWorldBounds = true;
         npcs.push(npc);
     }
+}
 
+function render_player() {
     player = game.add.sprite(npc_data[0].position[0], npc_data[0].position[1], npc_data[0].name);
     player.anchor.set(0.5);
     game.physics.arcade.enable(player);
     player.body.collideWorldBounds = true;
+}
 
-    start_npc_dialog();
+function generate_sentence() {
+    var subject = sentence_fragments.subjects[Math.round(Math.random() * (sentence_fragments.subjects.length - 1))];
+    var verb = sentence_fragments.verbs[Math.round(Math.random() * (sentence_fragments.verbs.length - 1))];
+    var object = sentence_fragments.objects[Math.round(Math.random() * (sentence_fragments.objects.length - 1))];
+    var ending = sentence_fragments.endings[Math.round(Math.random() * (sentence_fragments.endings.length - 1))];
+    return subject+' '+verb+' '+object+ending;
+}
+
+function business_speak() {
+    var sentence = generate_sentence();
+    if (!!dialog) {game.world.remove(dialog);}
+    dialog = game.add.text(400, 40, sentence, dialog_style);
+
+    zone_out();
+}
+
+function zone_out() {
+    attention_span--;
+}
+
+function render_coffee() {
+    coffee = game.add.button(480, 352, 'coffee', drink_coffee, this);
+    coffee_steam = game.add.emitter(491, 367, 1000);
+    coffee_steam.makeParticles('coffee-steam');
+    coffee_steam.setXSpeed(0, 0.1);
+    coffee_steam.setYSpeed(0, 0);
+    coffee_steam.setRotation(0, 10);
+    coffee_steam.setAlpha(1, 0, 10000, Phaser.Easing.Quintic.Out);
+    coffee_steam.setScale(0.1, 1, 0.1, 0.2, 0);
+    coffee_steam.gravity = -5;
+    coffee_steam.start(false, 4000, 5);
+}
+
+function drink_coffee() {
+    attention_span++;
+}
+
+function preload() {
+    game.load.tilemap('map', 'assets/map.json', null, Phaser.Tilemap.TILED_JSON);
+    game.load.image('office-tiles', 'assets/office-tiles.png', 32, 32);
+    game.load.image('coffee', 'assets/coffee.png');
+    game.load.image('coffee-steam', 'assets/coffee-steam.png');
+
+    for (var i=0; i<npc_data.length; i++) {
+        var name = npc_data[i].name;
+        game.load.image(name, 'assets/'+name+'.png', 32, 32);
+    }
+}
+
+function create() {
+    game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+    game.scale.pageAlignHorizontally = true;
+    game.scale.pageAlignvertically = true;
+    game.physics.startSystem(Phaser.Physics.ARCADE);
+    game.physics.arcade.skipQuadTree = false;
+
+    render_map();
+    render_npcs();
+    render_player();
+    render_coffee();
+
+    attention_span = 100;
+    game.add.text(10, 50, 'Attention Span', {
+        font: 'bold 10pt arial',
+        fill: '#f00',
+        stroke: '#fff',
+        strokeThickness: 5
+    });
+    game.time.events.loop(2000, business_speak, this);
+}
+
+function render_attention_bar() {
+    if (!!attention_bar) {
+        game.world.remove(attention_bar);
+    }
+    attention_bar = game.add.graphics(10, 83);
+    attention_bar.lineStyle(30, 0xff0000, 0.75);
+    attention_bar.moveTo(0, 0);
+    attention_bar.lineTo(attention_span * 2, 0);
 }
 
 function update() {
+    render_attention_bar();
+
     /*
     var distance_to_move = game.physics.arcade.distanceToPointer(player, game.input.activePointer);
     if (distance_to_move > 12) {

@@ -3,9 +3,6 @@
  <tileset firstgid="1" name="office-tiles" tilewidth="32" tileheight="32">
   <image source="../office-tiles.png" width="256" height="1344"/>
  </tileset>
- <tileset firstgid="337" name="coffee" tilewidth="32" tileheight="32">
-  <image source="../coffee.png" width="32" height="32"/>
- </tileset>
  <layer name="Background" width="30" height="20">
   <data encoding="base64" compression="zlib">
    eJzFlDsOwjAMhuNQoBMjEo+Fx8JjQXAxbsHItRi5UR2JSsbUjhOlZfgUKU385XfTeuecj1AjI6RCxsgEmX7mfeaz+5+gZ+E5+dlL0Nbr6kEt9ExCqqH12eoN+xfg3JKwgt+6VWHvG9mgZ0vYIa+C3nbkebu8Ut2YdwY2rzWv1TsHeZ8lr9YvzftQzmvNm+N9Gr1SXr7P+r+S5vmo5c3xriPvqK+8+8i30FdezUv9Q+al3pD3gGuPhNMAeUONC7sLV/hel3Jvzwne2LoU703xWnuW49XqlfBS6HwDc5csZA==
@@ -13,7 +10,7 @@
  </layer>
  <layer name="Foreground" width="30" height="20">
   <data encoding="base64" compression="zlib">
-   eJxzZ2Bg8ABidzrT/kAcMAD0KBgFo2AU0BMEMg60C0bBKBgFAwEA3ZESBQ==
+   eJxzZ2Bg8ABidzrT/kAcMAD0KBgFo2AUjIJRMApGAa0BAJbLEbM=
   </data>
  </layer>
  <layer name="Whiteboard" width="30" height="20">
