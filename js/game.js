@@ -44,6 +44,8 @@ var sentence_fragments = {
 }
 var map,
     background_layer,
+    foreground_layer,
+    whiteboard_layer,
     player;
 
 function generate_sentence() {
@@ -54,16 +56,32 @@ function generate_sentence() {
     return subject+' '+verb+' '+object+ending;
 }
 
+function start_npc_dialog() {
+    var dialog_style = {
+        font: 'bold 10pt arial',
+        fill: '#000',
+        wordWrap: true,
+        wordWrapWidth: '400'
+    };
+    var dialog = null;
+
+    setInterval(function() {
+        var sentence = generate_sentence();
+        if (!!dialog) {game.world.remove(dialog);}
+        dialog = game.add.text(400, 45, sentence, dialog_style);
+    }, 5000);
+}
+
 function preload() {
     game.load.tilemap('map', 'assets/map.json', null, Phaser.Tilemap.TILED_JSON);
     game.load.image('office-tiles', 'assets/office-tiles.png', 32, 32);
+    game.load.image('coffee-tiles', 'assets/coffee.png', 32, 32);
 
     for (var i=0; i<npc_data.length; i++) {
         var name = npc_data[i].name;
         game.load.image(name, 'assets/'+name+'.png', 32, 32);
     }
 }
-
 
 function create() {
     game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -74,9 +92,14 @@ function create() {
 
     map = game.add.tilemap('map');
     map.addTilesetImage('office-tiles', 'office-tiles', 960, 640);
+    map.addTilesetImage('coffee', 'coffee-tiles', 960, 640);
 
     background_layer = map.createLayer('Background');
+    foreground_layer = map.createLayer('Foreground');
+    whiteboard_layer = map.createLayer('Whiteboard');
     background_layer.resizeWorld();
+    foreground_layer.resizeWorld();
+    whiteboard_layer.resizeWorld();
 
     var name_tag_style = {
         font: 'sans serif',
@@ -98,6 +121,8 @@ function create() {
     player.anchor.set(0.5);
     game.physics.arcade.enable(player);
     player.body.collideWorldBounds = true;
+
+    start_npc_dialog();
 }
 
 function update() {
