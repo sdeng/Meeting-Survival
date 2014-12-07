@@ -56,7 +56,7 @@ var map,
     foreground_layer,
     whiteboard_layer,
     dialog,
-    burrito,
+    burritos,
     coffee,
     coffee_steam,
     attention_span,
@@ -103,9 +103,6 @@ function render_npcs() {
 function render_player() {
     player = game.add.sprite(npc_data[0].position[0], npc_data[0].position[1], npc_data[0].name);
     game.physics.arcade.enable(player, false);
-
-    player.anchor.set(0.5);
-    cursors = game.input.keyboard.createCursorKeys();
 }
 
 function generate_sentence() {
@@ -131,6 +128,8 @@ function zone_out() {
 
 function render_coffee() {
     coffee = game.add.button(480, 352, 'coffee', drink_coffee, this);
+    game.physics.arcade.enable(coffee, false);
+
     coffee_steam = game.add.emitter(491, 367, 1000);
     coffee_steam.makeParticles('coffee-steam');
     coffee_steam.setXSpeed(0, 0.1);
@@ -143,7 +142,20 @@ function render_coffee() {
 }
 
 function drink_coffee() {
+    if (game.physics.arcade.distanceBetween(player, coffee) > 40) {return;}
     attention_span = attention_threshold;
+    
+    console.log('Drinking coffee.');
+}
+
+function eat_burrito() {
+    for (var i=0; i<burritos.length; i++) {
+        if (game.physics.arcade.distanceBetween(player, burritos[i]) < 40) {
+            // TODO: Queue farts! 
+            game.world.remove(burritos[i]);
+            return;
+        }
+    }
 }
 
 function preload() {
@@ -175,7 +187,12 @@ function create() {
     render_player();
     render_coffee();
 
-    burrito = game.add.sprite(0, 500, 'burrito');
+    burritos = [];
+    for (var i=0; i<4; i++) {
+        var burrito = game.add.button(0, 420 + (i * 40), 'burrito', eat_burrito, this);
+        game.physics.arcade.enable(burrito, false);
+        burritos.push(burrito);
+    }
 
     attention_threshold = 1000;
     attention_span = attention_threshold;
@@ -208,8 +225,7 @@ function update_sheep() {
 function update_player() {
     game.physics.arcade.collide(player, foreground_layer);
 
-    var distance_to_move = game.physics.arcade.distanceToPointer(player, game.input.activePointer);
-    if (distance_to_move > 12) {
+    if (game.physics.arcade.distanceToPointer(player, game.input.activePointer) > 12) {
         game.physics.arcade.moveToPointer(player, 300);
     } else {
         player.body.velocity.set(0);
