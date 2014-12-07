@@ -60,6 +60,9 @@ var map,
     coffee,
     coffee_steam,
     fart,
+    fart_timer,
+    fart_delay,
+    fart_duration,
     attention_span,
     attention_threshold,
     sheep,
@@ -151,7 +154,12 @@ function drink_coffee() {
     console.log('Drinking coffee.');
 }
 
-function render_fart() {
+function fart_out() {
+    if (!!fart) {
+        fart.on = true;
+        return;
+    }
+
     var propagation_speed = 25;
     fart = game.add.emitter(20, 500, 10000);
     fart.makeParticles('fart');
@@ -164,11 +172,26 @@ function render_fart() {
     fart.start(false, 4000, 20);
 }
 
+function hold_farts() {
+    fart.on = false;
+    fart_timer.destroy();
+    fart_duration = 0;
+}
+
 function eat_burrito() {
     for (var i=0; i<burritos.length; i++) {
         if (game.physics.arcade.distanceBetween(player, burritos[i]) < 40) {
-            game.world.remove(burritos[i]);
-            render_fart();
+            var burrito_timer = game.time.create();
+            burritos[i].visible = false;
+            burrito_timer.add(5000, function() {burritos[i].visible = true;}, this);
+            burrito_timer.start();
+
+            if (!!fart_timer) {fart_timer.destroy();}
+            fart_duration += 2000;
+            fart_timer = game.time.create();
+            fart_timer.add(fart_delay, fart_out, this);
+            fart_timer.add(fart_delay + fart_duration, hold_farts, this);
+            fart_timer.start();
             return;
         }
     }
@@ -204,6 +227,8 @@ function create() {
     render_player();
     render_coffee();
 
+    fart_delay = 10000;
+    fart_duration = 0;
     burritos = [];
     for (var i=0; i<4; i++) {
         var burrito = game.add.button(0, 420 + (i * 40), 'burrito', eat_burrito, this);
