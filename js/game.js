@@ -152,13 +152,14 @@ function drink_coffee() {
 }
 
 function fart() {
-    fart = game.add.emitter(20, 500, 400);
+    var propagation_speed = 25;
+    fart = game.add.emitter(20, 500, 10000);
     fart.makeParticles('fart');
-    fart.setXSpeed(-50, 50);
-    fart.setYSpeed(-50, 50);
+    fart.setXSpeed(-1*propagation_speed, propagation_speed);
+    fart.setYSpeed(-1*propagation_speed, propagation_speed);
     fart.setRotation(-10, 10);
-    fart.setAlpha(0.1, 0.2, 3000);
-    fart.setScale(0.4, 20, 0.4, 20, 6000, Phaser.Easing.Quintic.Out);
+    fart.setAlpha(0.05, 0.2, 3000);
+    fart.setScale(0.1, 20, 0.1, 20, 0, Phaser.Easing.Quintic.Out);
     fart.gravity = 0;
     fart.start(false, 4000, 20);
 }
@@ -240,13 +241,15 @@ function update_sheep() {
 }
 
 function update_player() {
-    game.physics.arcade.collide(player, foreground_layer);
-
-    if (game.physics.arcade.distanceToPointer(player, game.input.activePointer) > 12) {
-        game.physics.arcade.moveToPointer(player, 300);
+    var mouse_x = game.input.mousePointer.x - 16;
+    var mouse_y = game.input.mousePointer.y - 16;
+    if (game.physics.arcade.distanceToXY(player, mouse_x, mouse_y) > 8) {
+        game.physics.arcade.moveToXY(player, mouse_x, mouse_y, 300);
     } else {
         player.body.velocity.set(0);
     }
+
+    game.physics.arcade.collide(player, foreground_layer);
 
     if (!!fart) {
         fart.emitX = player.x;
