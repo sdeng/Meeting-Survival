@@ -167,7 +167,7 @@ function fart_out() {
     fart.setYSpeed(-1*propagation_speed, propagation_speed);
     fart.setRotation(-10, 10);
     fart.setAlpha(0, 0.5, 3000, Phaser.Easing.Linear.None, true);
-    fart.setScale(1, 2, 1, 2, 0, Phaser.Easing.Quintic.Out);
+    fart.setScale(0.5, 4, 0.5, 4, 0, Phaser.Easing.Quintic.Out);
     fart.gravity = 0;
     fart.start(false, 4000, 20);
 }
