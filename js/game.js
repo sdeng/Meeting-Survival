@@ -63,6 +63,7 @@ var map,
     attention_bar,
     sheep,
     player,
+    cursors,
     sheep_collision_group,
     player_collision_group;
 
@@ -73,6 +74,7 @@ function render_map() {
     background_layer = map.createLayer('Background');
     foreground_layer = map.createLayer('Foreground');
     whiteboard_layer = map.createLayer('Whiteboard');
+    map.setCollisionBetween(1, 100000, true, 'Foreground');
     background_layer.resizeWorld();
     foreground_layer.resizeWorld();
     whiteboard_layer.resizeWorld();
@@ -100,13 +102,10 @@ function render_npcs() {
 
 function render_player() {
     player = game.add.sprite(npc_data[0].position[0], npc_data[0].position[1], npc_data[0].name);
-    player.anchor.set(0.5);
+    game.physics.arcade.enable(player, false);
 
-    game.physics.p2.enable(player, false);
-    player_collision_group = game.physics.p2.createCollisionGroup();
-    player.body.setCollisionGroup(player_collision_group);
-    player.body.setRectangle(32, 32);
-    player.body.fixedRotation = true;
+    player.anchor.set(0.5);
+    cursors = game.input.keyboard.createCursorKeys();
 }
 
 function generate_sentence() {
@@ -166,6 +165,7 @@ function create() {
     game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
     game.scale.pageAlignHorizontally = true;
     game.scale.pageAlignvertically = true;
+    game.physics.startSystem(Phaser.Physics.ARCADE);
     game.physics.startSystem(Phaser.Physics.P2JS);
     game.physics.p2.updateBoundsCollisionGroup();
     game.physics.p2.setImpactEvents(true);
@@ -187,6 +187,7 @@ function create() {
     });
     game.time.events.loop(2000, business_speak, this);
 
+    // Sheep collisions
     sheep_collision_group = game.physics.p2.createCollisionGroup();
     sheep = game.add.group();
     sheep.enableBody = true;
@@ -212,7 +213,7 @@ function update_sheep() {
         a_sheep.alpha = 0.25;
         a_sheep.body.setCircle(10);
         a_sheep.body.setCollisionGroup(sheep_collision_group);
-        a_sheep.body.collides([sheep_collision_group, player_collision_group]);
+        a_sheep.body.collides([sheep_collision_group]);
         a_sheep.body.velocity.x = Math.random() * 200;
         a_sheep.body.velocity.y = Math.random() * 200;
     } else if (num_sheep < sheep.length) {
@@ -220,16 +221,20 @@ function update_sheep() {
     }
 }
 
-function update() {
-    update_attention_bar();
-    update_sheep();
+function update_player() {
+    game.physics.arcade.collide(player, foreground_layer);
 
-    /*
     var distance_to_move = game.physics.arcade.distanceToPointer(player, game.input.activePointer);
     if (distance_to_move > 12) {
         game.physics.arcade.moveToPointer(player, 300);
     } else {
         player.body.velocity.set(0);
     }
-    */
+}
+
+function update() {
+    update_attention_bar();
+    update_player();
+    update_sheep();
+
 }

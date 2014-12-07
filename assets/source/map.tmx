@@ -5,12 +5,12 @@
  </tileset>
  <layer name="Background" width="30" height="20">
   <data encoding="base64" compression="zlib">
-   eJzFlDsOwjAMhuNQoBMjEo+Fx8JjQXAxbsHItRi5UR2JSsbUjhOlZfgUKU385XfTeuecj1AjI6RCxsgEmX7mfeaz+5+gZ+E5+dlL0Nbr6kEt9ExCqqH12eoN+xfg3JKwgt+6VWHvG9mgZ0vYIa+C3nbkebu8Ut2YdwY2rzWv1TsHeZ8lr9YvzftQzmvNm+N9Gr1SXr7P+r+S5vmo5c3xriPvqK+8+8i30FdezUv9Q+al3pD3gGuPhNMAeUONC7sLV/hel3Jvzwne2LoU703xWnuW49XqlfBS6HwDc5csZA==
+   eJzFlVEKgzAMhtPq1Cu47RKiF/OYvgi70SIohNjEWKI+/BRb2q9fqG0EgHiQBlNgSswLU2HqtT9mjo0Phe6Fe/K9e2RbL1WDRqiZFGkNrc5W7jK/DQBvkk/Yr1s6c3+C6+TI3Vrum+JK61rO+mzgWn3PcKV5Fl+tXh5czfdKruTL51nvK6mft5pvDvcbbFxv36N/4SpfbYzy7/Sl3Kd8tbdZu/s8uB07g/36ncMdEm/K2Zp5+3pwaWj/HxdsI+4=
   </data>
  </layer>
  <layer name="Foreground" width="30" height="20">
   <data encoding="base64" compression="zlib">
-   eJxzZ2Bg8ABidzrT/kAcMAD0KBgFo2AUjIJRMApGAa0BAJbLEbM=
+   eJxzZ2Bg8ABidzrT/kAcMAD0SAMdA2TvBBLUKjIyMCghYWVG8u1lIUEvNe3lGSB7RQbIXlLAqL1Dz16VAUpXo/biBppAtVpIWJtO9o4C8gEAQJkcBw==
   </data>
  </layer>
  <layer name="Whiteboard" width="30" height="20">
