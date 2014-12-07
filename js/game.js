@@ -34,6 +34,9 @@ var npc_data = [
     }, {
         name: 'manager',
         position: [370, 70]
+    }, {
+        name: 'hodor',
+        position: [512, 465]
     }
 ];
 var sentence_fragments = {
@@ -44,7 +47,7 @@ var sentence_fragments = {
 }
 var dialog_style = {
     font: 'bold 10pt arial',
-    fill: '#000',
+    fill: '#888',
     wordWrap: true,
     wordWrapWidth: '400'
 };
@@ -53,6 +56,7 @@ var map,
     foreground_layer,
     whiteboard_layer,
     dialog,
+    burrito,
     coffee,
     coffee_steam,
     attention_span,
@@ -87,9 +91,9 @@ function render_npcs() {
         var x = npc_data[i].position[0];
         var y = npc_data[i].position[1];
         var npc = game.add.sprite(x, y, name);
+        npc.animations.add('idle');
+        npc.animations.play('idle', 1, true);
         game.add.text(x, y+30, name, name_tag_style);
-        game.physics.arcade.enable(npc);
-        npc.body.collideWorldBounds = true;
         npcs.push(npc);
     }
 }
@@ -97,8 +101,12 @@ function render_npcs() {
 function render_player() {
     player = game.add.sprite(npc_data[0].position[0], npc_data[0].position[1], npc_data[0].name);
     player.anchor.set(0.5);
-    game.physics.arcade.enable(player);
-    player.body.collideWorldBounds = true;
+
+    game.physics.p2.enable(player, false);
+    player_collision_group = game.physics.p2.createCollisionGroup();
+    player.body.setCollisionGroup(player_collision_group);
+    player.body.setRectangle(32, 32);
+    player.body.fixedRotation = true;
 }
 
 function generate_sentence() {
@@ -136,7 +144,7 @@ function render_coffee() {
 }
 
 function drink_coffee() {
-    if (attention_span == 10) { return; }
+    if (attention_span == 100) { return; }
     attention_span++;
 }
 
@@ -146,10 +154,11 @@ function preload() {
     game.load.image('coffee', 'assets/coffee.png');
     game.load.image('coffee-steam', 'assets/coffee-steam.png');
     game.load.image('sheep', 'assets/sheep.png');
+    game.load.image('burrito', 'assets/burrito.png');
 
     for (var i=0; i<npc_data.length; i++) {
         var name = npc_data[i].name;
-        game.load.image(name, 'assets/'+name+'.png', 32, 32);
+        game.load.spritesheet(name, 'assets/'+name+'.png', 32, 32, 2);
     }
 }
 
@@ -158,6 +167,8 @@ function create() {
     game.scale.pageAlignHorizontally = true;
     game.scale.pageAlignvertically = true;
     game.physics.startSystem(Phaser.Physics.P2JS);
+    game.physics.p2.updateBoundsCollisionGroup();
+    game.physics.p2.setImpactEvents(true);
     game.physics.p2.restitution = 1;
 
     render_map();
@@ -165,16 +176,17 @@ function create() {
     render_player();
     render_coffee();
 
-    attention_span = 10;
+    burrito = game.add.sprite(0, 500, 'burrito');
+
+    attention_span = 100;
     game.add.text(10, 50, 'Attention Span', {
         font: 'bold 10pt arial',
-        fill: '#f00',
-        stroke: '#fff',
+        fill: '#000',
+        stroke: '#ff0',
         strokeThickness: 5
     });
     game.time.events.loop(2000, business_speak, this);
 
-    player_collision_group = game.physics.p2.createCollisionGroup();
     sheep_collision_group = game.physics.p2.createCollisionGroup();
     sheep = game.add.group();
     sheep.enableBody = true;
@@ -186,27 +198,25 @@ function update_attention_bar() {
         game.world.remove(attention_bar);
     }
     attention_bar = game.add.graphics(10, 83);
-    attention_bar.lineStyle(30, 0xff0000, 0.75);
+    attention_bar.lineStyle(30, 0xffff00, 0.5);
     attention_bar.moveTo(0, 0);
-    attention_bar.lineTo(attention_span * 30, 0);
+    attention_bar.lineTo(attention_span * 2, 0);
 }
 
 function update_sheep() {
-    var attention_deficit = 10 - attention_span;
+    var attention_deficit = 100 - attention_span;
     var num_sheep = attention_deficit;
 
-    if (num_sheep > sheep.length) {
+    if (num_sheep > sheep.countLiving()) {
         var a_sheep = sheep.create(game.world.randomX, game.world.randomY, 'sheep');
-        a_sheep.body.setRectangle(50, 50);
+        a_sheep.alpha = 0.25;
+        a_sheep.body.setCircle(10);
         a_sheep.body.setCollisionGroup(sheep_collision_group);
-        a_sheep.body.collides([sheep_collision_group]);
-        a_sheep.scale.x = 2.5;
-        a_sheep.scale.y = 2.5;
-        a_sheep.body.velocity.x = Math.random() * 2000;
-        a_sheep.body.velocity.y = Math.random() * 2000;
+        a_sheep.body.collides([sheep_collision_group, player_collision_group]);
+        a_sheep.body.velocity.x = Math.random() * 200;
+        a_sheep.body.velocity.y = Math.random() * 200;
     } else if (num_sheep < sheep.length) {
-        var a_sheep = sheep.removeChildAt(0);
-        game.world.remove(a_sheep);
+        sheep.removeChildAt(0);
     }
 }
 
