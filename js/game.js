@@ -158,8 +158,8 @@ function fart() {
     fart.setXSpeed(-1*propagation_speed, propagation_speed);
     fart.setYSpeed(-1*propagation_speed, propagation_speed);
     fart.setRotation(-10, 10);
-    fart.setAlpha(0.05, 0.2, 3000);
-    fart.setScale(0.1, 20, 0.1, 20, 0, Phaser.Easing.Quintic.Out);
+    fart.setAlpha(0, 0.5, 3000, Phaser.Easing.Linear.None, true);
+    fart.setScale(10, 20, 10, 20, 0, Phaser.Easing.Quintic.Out);
     fart.gravity = 0;
     fart.start(false, 4000, 20);
 }
