@@ -60,7 +60,7 @@ var map,
     coffee,
     coffee_steam,
     attention_span,
-    attention_bar,
+    attention_threshold,
     sheep,
     player,
     cursors,
@@ -143,8 +143,7 @@ function render_coffee() {
 }
 
 function drink_coffee() {
-    if (attention_span == 100) { return; }
-    attention_span++;
+    attention_span = attention_threshold;
 }
 
 function preload() {
@@ -178,13 +177,8 @@ function create() {
 
     burrito = game.add.sprite(0, 500, 'burrito');
 
-    attention_span = 100;
-    game.add.text(10, 50, 'Attention Span', {
-        font: 'bold 10pt arial',
-        fill: '#000',
-        stroke: '#ff0',
-        strokeThickness: 5
-    });
+    attention_threshold = 1000;
+    attention_span = attention_threshold;
     game.time.events.loop(2000, business_speak, this);
 
     // Sheep collisions
@@ -194,18 +188,8 @@ function create() {
     sheep.physicsBodyType = Phaser.Physics.P2JS;
 }
 
-function update_attention_bar() {
-    if (!!attention_bar) {
-        game.world.remove(attention_bar);
-    }
-    attention_bar = game.add.graphics(10, 83);
-    attention_bar.lineStyle(30, 0xffff00, 0.5);
-    attention_bar.moveTo(0, 0);
-    attention_bar.lineTo(attention_span * 2, 0);
-}
-
 function update_sheep() {
-    var attention_deficit = 100 - attention_span;
+    var attention_deficit = attention_threshold - attention_span;
     var num_sheep = attention_deficit;
 
     if (num_sheep > sheep.countLiving()) {
@@ -233,8 +217,6 @@ function update_player() {
 }
 
 function update() {
-    update_attention_bar();
     update_player();
     update_sheep();
-
 }
