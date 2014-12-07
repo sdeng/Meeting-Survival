@@ -5,12 +5,12 @@
  </tileset>
  <layer name="Background" width="30" height="20">
   <data encoding="base64" compression="zlib">
-   eJzFlW0KgzAMhtP6Ma/g5iVEL7Zj7o+wGy2ChRCbNEqcP15KG5KnbyhpBIBYUIeqUDWqQbWox3YeT8beN4nehfvkd/dQqpfrQSf0TJJUQ+uzlbvm9wHgSfQK+7q1M/creP04ctPK/ea4Ul2Nm3IXA9fqt8S1vAuLX61fHlzN75VcyS/PK82r0vzjq+b3CDfFhmDjevm1xK70q8Uo/59+Kfcuv9rfrM0+D+7I3uC07c9w58yfcrRn3n49uFT0/AcyjSPC
+   eJzFlVEOgzAIhmnnpgfYi26XWLaLeUwfd6NhYhPCgKJBffjTWAIfPzZtBoBcUYe6oBrUFXVDtct+3hgbTxLthfvkvUeo1JNm0Ckz06TVsObs5c75fQIYiB7pv24TzP0qXqdAblm5X4mr1bW42hmSuF6/Na7nXHj8zrn3JPcdwbX8av9pT788r3Zf1e4/vlp+13BL7Jl83Ci/ntiefq0Y5R/pl3LP8mu9zdbdF8F9sTP4Xr63cD/Cm7J2ZtF+I7hUdP8HsBEjBg==
   </data>
  </layer>
  <layer name="Foreground" width="30" height="20">
   <data encoding="base64" compression="zlib">
-   eJxzZ2Bg8ABidzrT/kAcMAD0SAMdA2TvBBLUKjIyMCghYWVG8u1lIUEvNe3lGQB7g4FYZADsjSZRPTXDedRe+tirMkD5aNRe3EATqFYLCWvTyd5RQD4AAOuWHLU=
+   eJxzZ2Bg8ABidzrT/kAcMAD0KBh8QJGRgUEJCSszDqy9LDS2H5e9PCTaG0wle0kF0QNkL6lg1F7yzVIhQe+ovfSxVxOoVgsJa9PJ3lFAPgAAf7cbiA==
   </data>
  </layer>
  <layer name="Whiteboard" width="30" height="20">

@@ -174,6 +174,15 @@ function render_thermometer() {
     game.physics.arcade.enable(thermometer, false);
 }
 
+
+function render_hack() {
+    hack = game.add.button(542, 195, 'hack', hack_computer, this);
+}
+
+function hack_computer() {
+    console.log('Robot short circuiting.');
+}
+
 function toggle_temperature() {
     if (game.physics.arcade.distanceBetween(player, thermometer) > 40) {return;}
 
@@ -259,6 +268,7 @@ function preload() {
     game.load.image('fart', 'assets/fart-cloud.png');
     game.load.image('sheep', 'assets/sheep.png');
     game.load.image('burrito', 'assets/burrito.png');
+    game.load.image('hack', 'assets/hack.png');
     game.load.spritesheet('thermometer', 'assets/thermometer.png', 16, 16, 2);
     game.load.spritesheet('snowman-melting', 'assets/snowman-melting.png', 32, 32, 10);
 
@@ -284,6 +294,7 @@ function create() {
     render_coffee();
     render_burritos();
     render_thermometer();
+    render_hack();
 
     quorum = 5;
     attention_threshold = 1000;
