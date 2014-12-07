@@ -192,11 +192,13 @@ function toggle_temperature() {
 
 function melt_snowman() {
     melt_timer = game.time.create();
-    melt_timer.add(30000, function() {
-        console.log('snowman melted');
-        quorum--;
+    melt_timer.add(15000, function() {
+        var snowman_melting = game.add.sprite(npcs[3].x, npcs[3].y, 'snowman-melting');
+        snowman_melting.animations.add('melt');
+        snowman_melting.play('melt', 1, false);
         game.world.remove(npcs[3].label);
         game.world.remove(npcs[3]);
+        quorum--;
     }, this);
     melt_timer.start();
 }
@@ -258,6 +260,7 @@ function preload() {
     game.load.image('sheep', 'assets/sheep.png');
     game.load.image('burrito', 'assets/burrito.png');
     game.load.spritesheet('thermometer', 'assets/thermometer.png', 16, 16, 2);
+    game.load.spritesheet('snowman-melting', 'assets/snowman-melting.png', 32, 32, 10);
 
     for (var i=0; i<npc_data.length; i++) {
         var name = npc_data[i].name;
