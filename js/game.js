@@ -151,7 +151,7 @@ function drink_coffee() {
     console.log('Drinking coffee.');
 }
 
-function fart() {
+function render_fart() {
     var propagation_speed = 25;
     fart = game.add.emitter(20, 500, 10000);
     fart.makeParticles('fart');
@@ -159,7 +159,7 @@ function fart() {
     fart.setYSpeed(-1*propagation_speed, propagation_speed);
     fart.setRotation(-10, 10);
     fart.setAlpha(0, 0.5, 3000, Phaser.Easing.Linear.None, true);
-    fart.setScale(10, 20, 10, 20, 0, Phaser.Easing.Quintic.Out);
+    fart.setScale(1, 2, 1, 2, 0, Phaser.Easing.Quintic.Out);
     fart.gravity = 0;
     fart.start(false, 4000, 20);
 }
@@ -168,7 +168,7 @@ function eat_burrito() {
     for (var i=0; i<burritos.length; i++) {
         if (game.physics.arcade.distanceBetween(player, burritos[i]) < 40) {
             game.world.remove(burritos[i]);
-            fart();
+            render_fart();
             return;
         }
     }
@@ -179,7 +179,7 @@ function preload() {
     game.load.image('office-tiles', 'assets/office-tiles.png', 32, 32);
     game.load.image('coffee', 'assets/coffee.png');
     game.load.image('coffee-steam', 'assets/coffee-steam.png');
-    game.load.image('fart', 'assets/fart.png');
+    game.load.image('fart', 'assets/fart-cloud.png');
     game.load.image('sheep', 'assets/sheep.png');
     game.load.image('burrito', 'assets/burrito.png');
 
