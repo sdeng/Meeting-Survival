@@ -41,7 +41,7 @@ var npc_data = [
 ];
 var sentence_fragments = {
     subjects: ['We', 'The company', 'Our organization', 'You', 'The competition', 'People'],
-    verbs: ['will strive towards', 'obtained buy-in from', 'must monetize', 'shall synergize with', 'will strategize', 'might evangelize', 'tackled low hanging fruit', 'will follow up with', 'circle back on', 'hit the ground running with regards to', 'indeed escalate', 'reached out to', 'shall think out side of the box about', 'must innovate', 'ramped up', 'mustn\'t boil the ocean for', 'tried to circle the wagons of', 'must not', 'shall not', 'should not', 'dropped the ball, so'],
+    verbs: ['will strive towards', 'obtained buy-in from', 'must monetize', 'shall synergize with', 'will strategize', 'might evangelize', 'tackled low hanging fruit', 'will follow up with', 'circle back on', 'hit the ground running with regards to', 'indeed escalate', 'reached out to', 'shall think out side of the box about', 'must innovate', 'ramped up', 'mustn\'t boil the ocean for', 'tried to circle the wagons of', 'must not', 'shall not', 'should not', 'really dropped the ball on'],
     objects: ['customer segments', 'business units', 'key performance metrics', 'stakeholders', 'return on investment', 'common painpoints', 'value-add', 'the long pole in the tent'],
     endings: ['.', '!', ', as it were.', ', if you will.', ' with all hands on deck.', ' solutions.', ', but let\'s take this offline.', ', but table that for now.', '. Is that on your radar?', ' in the weeds']
 }
@@ -67,6 +67,8 @@ var map,
     attention_threshold,
     sheep,
     player,
+    quorum,
+    quorum_indicator,
     cursors,
     sheep_collision_group,
     player_collision_group;
@@ -109,6 +111,18 @@ function render_player() {
     player.animations.add('idle');
     player.animations.play('idle', 1, true);
     game.physics.arcade.enable(player, false);
+}
+
+function render_burritos() {
+    fart_delay = 10000;
+    fart_duration = 0;
+    burritos = [];
+
+    for (var i=0; i<4; i++) {
+        var burrito = game.add.button(0, 420 + (i * 40), 'burrito', eat_burrito, this);
+        game.physics.arcade.enable(burrito, false);
+        burritos.push(burrito);
+    }
 }
 
 function generate_sentence() {
@@ -226,16 +240,9 @@ function create() {
     render_npcs();
     render_player();
     render_coffee();
+    render_burritos();
 
-    fart_delay = 10000;
-    fart_duration = 0;
-    burritos = [];
-    for (var i=0; i<4; i++) {
-        var burrito = game.add.button(0, 420 + (i * 40), 'burrito', eat_burrito, this);
-        game.physics.arcade.enable(burrito, false);
-        burritos.push(burrito);
-    }
-
+    quorum = 5;
     attention_threshold = 1000;
     attention_span = attention_threshold;
     game.time.events.loop(2000, business_speak, this);
@@ -245,7 +252,6 @@ function create() {
     sheep = game.add.group();
     sheep.enableBody = true;
     sheep.physicsBodyType = Phaser.Physics.P2JS;
-
 }
 
 function update_sheep() {
@@ -282,7 +288,12 @@ function update_player() {
     }
 }
 
+function update_quorum() {
+    quorum_indicator = game.add.text(800, 600, 'Quorum: '+quorum);
+}
+
 function update() {
     update_player();
     update_sheep();
+    update_quorum();
 }
