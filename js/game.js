@@ -36,6 +36,7 @@ var npc_data = [
         position: [370, 70]
     }
 ];
+var sheep = [];
 var sentence_fragments = {
     subjects: ['We', 'The company', 'Our organization', 'You', 'The competition', 'People'],
     verbs: ['will strive towards', 'obtained buy-in from', 'must monetize', 'shall synergize with', 'will strategize', 'might evangelize', 'tackled low hanging fruit', 'will follow up with', 'circle back on', 'hit the ground running with regards to', 'indeed escalate', 'reached out to', 'shall think out side of the box about', 'must innovate', 'ramped up', 'mustn\'t boil the ocean for', 'tried to circle the wagons of', 'must not', 'shall not', 'should not', 'dropped the ball, so'],
@@ -132,6 +133,7 @@ function render_coffee() {
 }
 
 function drink_coffee() {
+    if (attention_span == 100) { return; }
     attention_span++;
 }
 
@@ -140,6 +142,7 @@ function preload() {
     game.load.image('office-tiles', 'assets/office-tiles.png', 32, 32);
     game.load.image('coffee', 'assets/coffee.png');
     game.load.image('coffee-steam', 'assets/coffee-steam.png');
+    game.load.image('sheep', 'assets/sheep.png');
 
     for (var i=0; i<npc_data.length; i++) {
         var name = npc_data[i].name;
@@ -169,7 +172,7 @@ function create() {
     game.time.events.loop(2000, business_speak, this);
 }
 
-function render_attention_bar() {
+function update_attention_bar() {
     if (!!attention_bar) {
         game.world.remove(attention_bar);
     }
@@ -179,8 +182,25 @@ function render_attention_bar() {
     attention_bar.lineTo(attention_span * 2, 0);
 }
 
+function update_sheep() {
+    var attention_deficit = 100 - attention_span;
+    var num_sheep = Math.floor(attention_deficit / 10);
+    if (num_sheep > sheep.length) {
+        var a_sheep = game.add.sprite(game.world.randomX, game.world.randomY, 'sheep');
+        game.physics.arcade.enable(a_sheep);
+        a_sheep.body.collideWorldBounds = true;
+        a_sheep.body.bounce.set(1);
+        a_sheep.body.velocity.setTo(1 + Math.random() * 40, 1 + Math.random() * 40);
+        sheep.push(a_sheep);
+    } else if (num_sheep < sheep.length) {
+        var a_sheep = sheep.pop();
+        game.world.remove(a_sheep);
+    }
+}
+
 function update() {
-    render_attention_bar();
+    update_attention_bar();
+    update_sheep();
 
     /*
     var distance_to_move = game.physics.arcade.distanceToPointer(player, game.input.activePointer);
