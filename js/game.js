@@ -36,7 +36,6 @@ var npc_data = [
         position: [370, 70]
     }
 ];
-var sheep = [];
 var sentence_fragments = {
     subjects: ['We', 'The company', 'Our organization', 'You', 'The competition', 'People'],
     verbs: ['will strive towards', 'obtained buy-in from', 'must monetize', 'shall synergize with', 'will strategize', 'might evangelize', 'tackled low hanging fruit', 'will follow up with', 'circle back on', 'hit the ground running with regards to', 'indeed escalate', 'reached out to', 'shall think out side of the box about', 'must innovate', 'ramped up', 'mustn\'t boil the ocean for', 'tried to circle the wagons of', 'must not', 'shall not', 'should not', 'dropped the ball, so'],
@@ -58,7 +57,10 @@ var map,
     coffee_steam,
     attention_span,
     attention_bar,
-    player;
+    sheep,
+    player,
+    sheep_collision_group,
+    player_collision_group;
 
 function render_map() {
     map = game.add.tilemap('map');
@@ -116,6 +118,7 @@ function business_speak() {
 }
 
 function zone_out() {
+    if (attention_span == 0) {return;}
     attention_span--;
 }
 
@@ -133,7 +136,7 @@ function render_coffee() {
 }
 
 function drink_coffee() {
-    if (attention_span == 100) { return; }
+    if (attention_span == 10) { return; }
     attention_span++;
 }
 
@@ -154,15 +157,15 @@ function create() {
     game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
     game.scale.pageAlignHorizontally = true;
     game.scale.pageAlignvertically = true;
-    game.physics.startSystem(Phaser.Physics.ARCADE);
-    game.physics.arcade.skipQuadTree = false;
+    game.physics.startSystem(Phaser.Physics.P2JS);
+    game.physics.p2.restitution = 1;
 
     render_map();
     render_npcs();
     render_player();
     render_coffee();
 
-    attention_span = 100;
+    attention_span = 10;
     game.add.text(10, 50, 'Attention Span', {
         font: 'bold 10pt arial',
         fill: '#f00',
@@ -170,6 +173,12 @@ function create() {
         strokeThickness: 5
     });
     game.time.events.loop(2000, business_speak, this);
+
+    player_collision_group = game.physics.p2.createCollisionGroup();
+    sheep_collision_group = game.physics.p2.createCollisionGroup();
+    sheep = game.add.group();
+    sheep.enableBody = true;
+    sheep.physicsBodyType = Phaser.Physics.P2JS;
 }
 
 function update_attention_bar() {
@@ -179,21 +188,24 @@ function update_attention_bar() {
     attention_bar = game.add.graphics(10, 83);
     attention_bar.lineStyle(30, 0xff0000, 0.75);
     attention_bar.moveTo(0, 0);
-    attention_bar.lineTo(attention_span * 2, 0);
+    attention_bar.lineTo(attention_span * 30, 0);
 }
 
 function update_sheep() {
-    var attention_deficit = 100 - attention_span;
-    var num_sheep = Math.floor(attention_deficit / 10);
+    var attention_deficit = 10 - attention_span;
+    var num_sheep = attention_deficit;
+
     if (num_sheep > sheep.length) {
-        var a_sheep = game.add.sprite(game.world.randomX, game.world.randomY, 'sheep');
-        game.physics.arcade.enable(a_sheep);
-        a_sheep.body.collideWorldBounds = true;
-        a_sheep.body.bounce.set(1);
-        a_sheep.body.velocity.setTo(1 + Math.random() * 40, 1 + Math.random() * 40);
-        sheep.push(a_sheep);
+        var a_sheep = sheep.create(game.world.randomX, game.world.randomY, 'sheep');
+        a_sheep.body.setRectangle(50, 50);
+        a_sheep.body.setCollisionGroup(sheep_collision_group);
+        a_sheep.body.collides([sheep_collision_group]);
+        a_sheep.scale.x = 2.5;
+        a_sheep.scale.y = 2.5;
+        a_sheep.body.velocity.x = Math.random() * 2000;
+        a_sheep.body.velocity.y = Math.random() * 2000;
     } else if (num_sheep < sheep.length) {
-        var a_sheep = sheep.pop();
+        var a_sheep = sheep.removeChildAt(0);
         game.world.remove(a_sheep);
     }
 }
