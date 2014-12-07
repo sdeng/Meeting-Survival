@@ -51,6 +51,8 @@ var dialog_style = {
     wordWrap: true,
     wordWrapWidth: '400'
 };
+var COLD = 0;
+var HOT = 1;
 var map,
     background_layer,
     foreground_layer,
@@ -69,7 +71,9 @@ var map,
     player,
     quorum,
     quorum_indicator,
-    cursors,
+    thermometer,
+    temperature,
+    melt_timer,
     sheep_collision_group,
     player_collision_group;
 
@@ -87,6 +91,10 @@ function render_map() {
 }
 
 function render_npcs() {
+    var name,
+        x,
+        y,
+        npc;
     var name_tag_style = {
         font: 'sans serif',
         fill: '#fff',
@@ -95,13 +103,13 @@ function render_npcs() {
     };
 
     for (var i=1; i<npc_data.length; i++) {
-        var name = npc_data[i].name;
-        var x = npc_data[i].position[0];
-        var y = npc_data[i].position[1];
-        var npc = game.add.sprite(x, y, name);
+        name = npc_data[i].name;
+        x = npc_data[i].position[0];
+        y = npc_data[i].position[1];
+        npc = game.add.sprite(x, y, name);
+        npc.label = game.add.text(x, y+30, name, name_tag_style);
         npc.animations.add('idle');
         npc.animations.play('idle', 1, true);
-        game.add.text(x, y+30, name, name_tag_style);
         npcs.push(npc);
     }
 }
@@ -161,11 +169,41 @@ function render_coffee() {
     coffee_steam.start(false, 4000, 5);
 }
 
+function render_thermometer() {
+    thermometer = game.add.button(928, 245, 'thermometer', toggle_temperature, this);
+    game.physics.arcade.enable(thermometer, false);
+}
+
+function toggle_temperature() {
+    if (game.physics.arcade.distanceBetween(player, thermometer) > 40) {return;}
+
+    if (temperature == COLD) {
+        thermometer.setFrames(HOT, HOT, HOT, HOT);
+        temperature = HOT;
+        melt_snowman();
+    } else if (temperature == HOT) {
+        thermometer.setFrames(COLD, COLD, COLD, COLD);
+        temperature = COLD;
+        if (!!melt_timer) {
+            melt_timer.destroy();
+        }
+    }
+}
+
+function melt_snowman() {
+    melt_timer = game.time.create();
+    melt_timer.add(30000, function() {
+        console.log('snowman melted');
+        quorum--;
+        game.world.remove(npcs[3].label);
+        game.world.remove(npcs[3]);
+    }, this);
+    melt_timer.start();
+}
+
 function drink_coffee() {
     if (game.physics.arcade.distanceBetween(player, coffee) > 40) {return;}
     attention_span = attention_threshold;
-    
-    console.log('Drinking coffee.');
 }
 
 function fart_out() {
@@ -219,6 +257,7 @@ function preload() {
     game.load.image('fart', 'assets/fart-cloud.png');
     game.load.image('sheep', 'assets/sheep.png');
     game.load.image('burrito', 'assets/burrito.png');
+    game.load.spritesheet('thermometer', 'assets/thermometer.png', 16, 16, 2);
 
     for (var i=0; i<npc_data.length; i++) {
         var name = npc_data[i].name;
@@ -241,10 +280,12 @@ function create() {
     render_player();
     render_coffee();
     render_burritos();
+    render_thermometer();
 
     quorum = 5;
     attention_threshold = 1000;
     attention_span = attention_threshold;
+    temperature = COLD;
     game.time.events.loop(2000, business_speak, this);
 
     // Sheep collisions
@@ -289,6 +330,7 @@ function update_player() {
 }
 
 function update_quorum() {
+    if (!!quorum_indicator) {game.world.remove(quorum_indicator);}
     quorum_indicator = game.add.text(800, 600, 'Quorum: '+quorum);
 }
 
