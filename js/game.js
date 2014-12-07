@@ -59,6 +59,7 @@ var map,
     burritos,
     coffee,
     coffee_steam,
+    fart,
     attention_span,
     attention_threshold,
     sheep,
@@ -102,6 +103,8 @@ function render_npcs() {
 
 function render_player() {
     player = game.add.sprite(npc_data[0].position[0], npc_data[0].position[1], npc_data[0].name);
+    player.animations.add('idle');
+    player.animations.play('idle', 1, true);
     game.physics.arcade.enable(player, false);
 }
 
@@ -148,11 +151,23 @@ function drink_coffee() {
     console.log('Drinking coffee.');
 }
 
+function fart() {
+    fart = game.add.emitter(20, 500, 400);
+    fart.makeParticles('fart');
+    fart.setXSpeed(-50, 50);
+    fart.setYSpeed(-50, 50);
+    fart.setRotation(-10, 10);
+    fart.setAlpha(0.1, 0.2, 3000);
+    fart.setScale(0.4, 20, 0.4, 20, 6000, Phaser.Easing.Quintic.Out);
+    fart.gravity = 0;
+    fart.start(false, 4000, 20);
+}
+
 function eat_burrito() {
     for (var i=0; i<burritos.length; i++) {
         if (game.physics.arcade.distanceBetween(player, burritos[i]) < 40) {
-            // TODO: Queue farts! 
             game.world.remove(burritos[i]);
+            fart();
             return;
         }
     }
@@ -163,6 +178,7 @@ function preload() {
     game.load.image('office-tiles', 'assets/office-tiles.png', 32, 32);
     game.load.image('coffee', 'assets/coffee.png');
     game.load.image('coffee-steam', 'assets/coffee-steam.png');
+    game.load.image('fart', 'assets/fart.png');
     game.load.image('sheep', 'assets/sheep.png');
     game.load.image('burrito', 'assets/burrito.png');
 
@@ -203,6 +219,7 @@ function create() {
     sheep = game.add.group();
     sheep.enableBody = true;
     sheep.physicsBodyType = Phaser.Physics.P2JS;
+
 }
 
 function update_sheep() {
@@ -229,6 +246,11 @@ function update_player() {
         game.physics.arcade.moveToPointer(player, 300);
     } else {
         player.body.velocity.set(0);
+    }
+
+    if (!!fart) {
+        fart.emitX = player.x;
+        fart.emitY = player.y;
     }
 }
 
