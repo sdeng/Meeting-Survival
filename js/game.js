@@ -66,6 +66,7 @@ var map,
     fart_timer,
     fart_delay,
     fart_duration,
+    fart_sensitive_group,
     attention_span,
     attention_threshold,
     snowman_melted,
@@ -110,11 +111,19 @@ function render_npcs() {
         x = npc_data[i].position[0];
         y = npc_data[i].position[1];
         npc = game.add.sprite(x, y, name);
+        game.physics.enable(npc, Phaser.Physics.ARCADE);
         npc.label = game.add.text(x, y+30, name, name_tag_style);
         npc.animations.add('idle');
         npc.animations.play('idle', 1, true);
         npcs.push(npc);
     }
+
+    fart_sensitive_group = game.add.group();
+    fart_sensitive_group.add(npcs[0]);
+    fart_sensitive_group.add(npcs[1]);
+    fart_sensitive_group.add(npcs[2]);
+    fart_sensitive_group.add(npcs[6]);
+    fart_sensitive_group.add(npcs[9]);
 }
 
 function render_player() {
@@ -125,7 +134,7 @@ function render_player() {
 }
 
 function render_burritos() {
-    fart_delay = 10000;
+    fart_delay = 3000;
     fart_duration = 0;
     burritos = [];
 
@@ -162,7 +171,7 @@ function render_coffee() {
     game.physics.arcade.enable(coffee, false);
 
     coffee_steam = game.add.emitter(491, 367, 1000);
-    coffee_steam.makeParticles('coffee-steam');
+    coffee_steam.makeParticles('coffee-steam', 0, 1000, true, true);
     coffee_steam.setXSpeed(0, 0.1);
     coffee_steam.setYSpeed(0, 0);
     coffee_steam.setRotation(0, 10);
@@ -256,20 +265,6 @@ function hold_farts() {
     fart_duration = 0;
 }
 
-function fart_exodus() {
-    [0, 1, 2, 6, 9].forEach(function(npc_index) {
-        var npc = npcs[npc_index];
-        game.world.remove(npc.label);
-        npc.pivot.x = 0;
-        npc.pivot.y = 32;
-        game.add.tween(npc).to({angle: 90}, 50, Phaser.Easing.Linear.None, true);
-        quorum--;
-    });
-
-    business_loop.timer.stop();
-    game.world.remove(dialog);
-}
-
 function eat_burrito() {
     for (var i=0; i<burritos.length; i++) {
         if (game.physics.arcade.distanceBetween(player, burritos[i]) < 40) {
@@ -283,10 +278,6 @@ function eat_burrito() {
             fart_timer = game.time.create();
             fart_timer.add(fart_delay, fart_out, this);
             fart_timer.add(fart_delay + fart_duration, hold_farts, this);
-            // TODO: Use fart collisions
-            if (fart_duration > 5000) {
-                fart_timer.add(fart_delay + 10000, fart_exodus, this);
-            }
             fart_timer.start();
             return;
         }
@@ -409,9 +400,27 @@ function check_victory() {
     congrats_timer.start();
 }
 
+function fart_death(fart, npc) {
+    if (!!npc.destroyed) {return;}
+
+    if (npc.label.text == 'manager') {
+        business_loop.timer.stop();
+        game.world.remove(dialog);
+    }
+
+    game.add.tween(npc).to({angle: 90}, 50, Phaser.Easing.Linear.None, true);
+    npc.label.destroy();
+    npc.destroyed = true;
+    quorum--;
+}
+
 function update() {
     update_player();
     update_sheep();
     update_quorum();
     check_victory();
+
+    if (!!fart) {
+        game.physics.arcade.collide(fart, fart_sensitive_group, fart_death);
+    }
 }
