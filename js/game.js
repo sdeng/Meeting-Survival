@@ -61,12 +61,14 @@ var map,
     burritos,
     coffee,
     coffee_steam,
+    business_loop,
     fart,
     fart_timer,
     fart_delay,
     fart_duration,
     attention_span,
     attention_threshold,
+    snowman_melted,
     sheep,
     player,
     quorum,
@@ -170,17 +172,23 @@ function render_coffee() {
 }
 
 function render_thermometer() {
-    thermometer = game.add.button(928, 245, 'thermometer', toggle_temperature, this);
+    thermometer = game.add.button(10, 350, 'thermometer', toggle_temperature, this);
     game.physics.arcade.enable(thermometer, false);
 }
 
 
 function render_hack() {
-    hack = game.add.button(542, 195, 'hack', hack_computer, this);
+    hack = game.add.button(542, 195, 'hack', short_circuit_robot, this);
+    game.physics.arcade.enable(hack, false);
 }
 
-function hack_computer() {
-    console.log('Robot short circuiting.');
+function short_circuit_robot() {
+    var robot_short_circuiting = game.add.sprite(npcs[7].x, npcs[7].y, 'robot-short-circuiting');
+    robot_short_circuiting.animations.add('death');
+    robot_short_circuiting.play('death', 5, false);
+    game.world.remove(npcs[7].label);
+    game.world.remove(npcs[7]);
+    quorum--;
 }
 
 function toggle_temperature() {
@@ -189,10 +197,12 @@ function toggle_temperature() {
     if (temperature == COLD) {
         thermometer.setFrames(HOT, HOT, HOT, HOT);
         temperature = HOT;
+        if (!!snowman_melted) {return;}
         melt_snowman();
     } else if (temperature == HOT) {
         thermometer.setFrames(COLD, COLD, COLD, COLD);
         temperature = COLD;
+        if (!!snowman_melted) {return;}
         if (!!melt_timer) {
             melt_timer.destroy();
         }
@@ -201,10 +211,11 @@ function toggle_temperature() {
 
 function melt_snowman() {
     melt_timer = game.time.create();
-    melt_timer.add(15000, function() {
+    melt_timer.add(5000, function() {
         var snowman_melting = game.add.sprite(npcs[3].x, npcs[3].y, 'snowman-melting');
-        snowman_melting.animations.add('melt');
-        snowman_melting.play('melt', 1, false);
+        snowman_melted = true;
+        snowman_melting.animations.add('death');
+        snowman_melting.play('death', 1, false);
         game.world.remove(npcs[3].label);
         game.world.remove(npcs[3]);
         quorum--;
@@ -223,14 +234,14 @@ function fart_out() {
         return;
     }
 
-    var propagation_speed = 25;
+    var propagation_speed = 50;
     fart = game.add.emitter(20, 500, 10000);
     fart.makeParticles('fart');
     fart.setXSpeed(-1*propagation_speed, propagation_speed);
     fart.setYSpeed(-1*propagation_speed, propagation_speed);
     fart.setRotation(-10, 10);
     fart.setAlpha(0, 0.5, 3000, Phaser.Easing.Linear.None, true);
-    fart.setScale(0.5, 4, 0.5, 4, 0, Phaser.Easing.Quintic.Out);
+    fart.setScale(1, 1, 1, 1, 0, Phaser.Easing.Quintic.Out);
     fart.gravity = 0;
     fart.start(false, 4000, 20);
 }
@@ -239,6 +250,20 @@ function hold_farts() {
     fart.on = false;
     fart_timer.destroy();
     fart_duration = 0;
+}
+
+function fart_exodus() {
+    [0, 1, 2, 6, 9].forEach(function(npc_index) {
+        var npc = npcs[npc_index];
+        game.world.remove(npc.label);
+        npc.pivot.x = 0;
+        npc.pivot.y = 32;
+        game.add.tween(npc).to({angle: 90}, 50, Phaser.Easing.Linear.None, true);
+        quorum--;
+    });
+
+    business_loop.timer.stop();
+    game.world.remove(dialog);
 }
 
 function eat_burrito() {
@@ -250,9 +275,10 @@ function eat_burrito() {
             burrito_timer.start();
 
             if (!!fart_timer) {fart_timer.destroy();}
-            fart_duration += 2000;
+            fart_duration += 30000;
             fart_timer = game.time.create();
             fart_timer.add(fart_delay, fart_out, this);
+            fart_timer.add(fart_delay + 2000, fart_exodus, this);
             fart_timer.add(fart_delay + fart_duration, hold_farts, this);
             fart_timer.start();
             return;
@@ -271,6 +297,7 @@ function preload() {
     game.load.image('hack', 'assets/hack.png');
     game.load.spritesheet('thermometer', 'assets/thermometer.png', 16, 16, 2);
     game.load.spritesheet('snowman-melting', 'assets/snowman-melting.png', 32, 32, 10);
+    game.load.spritesheet('robot-short-circuiting', 'assets/robot-short-circuiting.png', 32, 32, 10);
 
     for (var i=0; i<npc_data.length; i++) {
         var name = npc_data[i].name;
@@ -296,11 +323,12 @@ function create() {
     render_thermometer();
     render_hack();
 
-    quorum = 5;
+    quorum = 6;
     attention_threshold = 1000;
     attention_span = attention_threshold;
+    snowman_melted = false;
     temperature = COLD;
-    game.time.events.loop(2000, business_speak, this);
+    business_loop = game.time.events.loop(2000, business_speak, this);
 
     // Sheep collisions
     sheep_collision_group = game.physics.p2.createCollisionGroup();
@@ -345,7 +373,13 @@ function update_player() {
 
 function update_quorum() {
     if (!!quorum_indicator) {game.world.remove(quorum_indicator);}
-    quorum_indicator = game.add.text(800, 600, 'Quorum: '+quorum);
+
+    if (quorum >= 0) {
+        var count = 'Quorum +'+quorum;
+    } else {
+        var count = 'Quorum '+quorum;
+    }
+    quorum_indicator = game.add.text(800, 600, count);
 }
 
 function update() {
