@@ -391,7 +391,7 @@ function update_quorum() {
 }
 
 function check_victory() {
-    if (quorum > 0) {return;}
+    if (quorum >= 0) {return;}
 
     var congrats_timer = game.time.create();
     congrats_timer.add(1000, function() {
