@@ -69,6 +69,7 @@ var map,
     attention_span,
     attention_threshold,
     snowman_melted,
+    robot_shorted,
     sheep,
     player,
     quorum,
@@ -183,9 +184,12 @@ function render_hack() {
 }
 
 function short_circuit_robot() {
+    if (!!robot_shorted) {return;}
+
     var robot_short_circuiting = game.add.sprite(npcs[7].x, npcs[7].y, 'robot-short-circuiting');
     robot_short_circuiting.animations.add('death');
     robot_short_circuiting.play('death', 5, false);
+    robot_shorted = true;
     game.world.remove(npcs[7].label);
     game.world.remove(npcs[7]);
     quorum--;
@@ -275,11 +279,14 @@ function eat_burrito() {
             burrito_timer.start();
 
             if (!!fart_timer) {fart_timer.destroy();}
-            fart_duration += 30000;
+            fart_duration += 3000;
             fart_timer = game.time.create();
             fart_timer.add(fart_delay, fart_out, this);
-            fart_timer.add(fart_delay + 2000, fart_exodus, this);
             fart_timer.add(fart_delay + fart_duration, hold_farts, this);
+            // TODO: Use fart collisions
+            if (fart_duration > 5000) {
+                fart_timer.add(fart_delay + 10000, fart_exodus, this);
+            }
             fart_timer.start();
             return;
         }
@@ -327,6 +334,7 @@ function create() {
     attention_threshold = 1000;
     attention_span = attention_threshold;
     snowman_melted = false;
+    robot_shorted = false;
     temperature = COLD;
     business_loop = game.time.events.loop(2000, business_speak, this);
 
@@ -382,8 +390,28 @@ function update_quorum() {
     quorum_indicator = game.add.text(800, 600, count);
 }
 
+function check_victory() {
+    if (quorum > 0) {return;}
+
+    var congrats_timer = game.time.create();
+    congrats_timer.add(1000, function() {
+        game.paused = true;
+        game.add.text(50, 200, 'Congrats!\nMEETING CANCELED!', {
+            font: 'bold 58pt arial',
+            fill: '#f88',
+            stroke: '#000',
+            strokeThickness: 16,
+            wordWrap: true,
+            wordWrapWidth: '900',
+            align: 'center'
+        });
+    });
+    congrats_timer.start();
+}
+
 function update() {
     update_player();
     update_sheep();
     update_quorum();
+    check_victory();
 }
