@@ -131,6 +131,7 @@ function render_player() {
     player.animations.add('idle');
     player.animations.play('idle', 1, true);
     game.physics.arcade.enable(player, false);
+    player.body.collideWorldBounds = true;
 }
 
 function render_burritos() {
@@ -322,12 +323,12 @@ function create() {
     render_hack();
 
     quorum = 6;
-    attention_threshold = 1000;
+    attention_threshold = 10000;
     attention_span = attention_threshold;
     snowman_melted = false;
     robot_shorted = false;
     temperature = COLD;
-    business_loop = game.time.events.loop(2000, business_speak, this);
+    business_loop = game.time.events.loop(1000, business_speak, this);
 
     // Sheep collisions
     sheep_collision_group = game.physics.p2.createCollisionGroup();
