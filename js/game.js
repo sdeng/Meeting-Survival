@@ -1,4 +1,4 @@
-var game = new Phaser.Game(960, 960, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+var game = new Phaser.Game(960, 640, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 var npcs = [];
 var npc_data = [
     {
